@@ -1,0 +1,464 @@
+# define _CRT_SECURE_NO_WARNINGS
+# include <stdio.h>
+# include <string.h>
+# include <ctype.h>
+# include <limits.h>
+# include <stdlib.h>
+
+typedef enum radnoMesto { Car, Kralj, Regent, Zupan, Vozd, Knez } RM;
+
+typedef struct osnov {
+	int sifraOsnova;
+	char opis[100];
+}OSNOV;
+
+typedef struct isplata {
+	int sifraIsplate;
+	char datum[100];
+	double iznos;
+	OSNOV opisOsnova;
+}ISPLATA;
+
+typedef struct listaisplata* PISPLATA;
+typedef struct listaisplata {
+	ISPLATA podatak;
+	PISPLATA sledeci;
+}LISTAISPLATA;
+
+
+
+typedef struct zaposlen {
+	int sifraZaposlenog;
+	char ime[20];
+	char prezime[30];
+	char radnomesto[20];
+	PISPLATA isplata;
+}ZAPOSLEN;
+
+typedef struct listazaposlenih* PZAPOSLENIH;
+typedef struct listazaposlenih {
+	ZAPOSLEN podatak;
+	PZAPOSLENIH sledeci;
+}LISTAZAPOSLENIH;
+
+/////////////////////////////////////////////////////////////////////
+
+// RADI
+PZAPOSLENIH vratiZaposlenog(PZAPOSLENIH* glava, int sifra) {
+
+	if (glava == NULL) {
+		printf("\nLista zaposlenih je prazna POKAZIVAC\n");
+		return 0;
+	}
+
+	PZAPOSLENIH pom = glava;
+
+	while (pom != NULL) {
+		if (pom->podatak.sifraZaposlenog == sifra) {
+			printf("\nZaposleni sa tom sifrom postoji u listi zaposlenih POKAZIVAC\n");
+			return pom;
+		}
+		pom = pom->sledeci;
+	}
+	printf("\nZaposleni sa tom sifrom ne postoji u listi zaposlenih POKAZIVAC\n");
+	return pom;
+}
+
+// RADI
+int postojiSifraIsplate(PZAPOSLENIH glava, int sifraIsplate) {
+	if (glava == NULL) {
+		printf("\n Lista zaposlenih je prazna\n");
+		return 0;
+	}
+
+	PZAPOSLENIH pom = glava;
+
+	while (pom != NULL) {
+		while (pom->podatak.isplata != NULL) {
+			if (pom->podatak.isplata->podatak.sifraIsplate == sifraIsplate) {
+				printf("\nIsplata sa tom sifrom postoji u listi zaposlenih\n");
+				return 1;
+			}
+			pom->podatak.isplata = pom->podatak.isplata->sledeci;
+		}
+		pom = pom->sledeci;
+	}
+	printf("\nIsplata sa tom sifrom ne postoji u listi zaposlenih\n");
+	return 0;
+}
+
+
+// NERADI
+void ucitajZaposlene(PZAPOSLENIH *glava) {
+	FILE* zaposleni = fopen("zaposlen.txt", "r");
+
+	if (zaposleni = NULL) {
+		printf("Greshka prilikom ucitavanja baze podataka Zaposleni");
+		return;
+	}
+
+	PZAPOSLENIH novi = malloc(sizeof(LISTAZAPOSLENIH));
+	
+
+	PZAPOSLENIH pom = glava;
+
+	while (fgetc(zaposleni) != EOF) {
+		fscanf(zaposleni, "%lf, %s, %s, %s", &novi->podatak.sifraZaposlenog, &novi->podatak.ime, &novi->podatak.prezime, &novi->podatak.radnomesto);
+		if (glava == NULL) {
+			*glava = novi;
+			break;
+		}
+		while (pom != NULL) {
+			pom = pom->sledeci;
+		}
+		pom = novi;
+	}
+
+	printf("\nUspesno je ucitana baza podataka\n");
+
+	fclose(zaposleni);
+}
+
+
+// RADI
+void snimiSveIzmeneNadBazomZaposleni(PZAPOSLENIH glava) {
+	FILE* zaposleni = fopen("zaposlen.txt", "w");
+
+	PZAPOSLENIH pom = glava;
+
+	while (pom != NULL) {
+		fprintf(zaposleni, "%d, %s, %s, %s\n", pom->podatak.sifraZaposlenog, pom->podatak.ime, pom->podatak.prezime, pom->podatak.radnomesto);
+		pom = pom->sledeci;
+	}
+
+	printf("\nBaza ZAPOSLENI uspesno azurirana\n\n");
+
+	fclose(zaposleni);
+}
+
+// RADI
+int postojiZaposleni(PZAPOSLENIH glava, int sifraZap) {
+
+	if (glava == NULL) {
+		printf("\n Lista zaposlenih je prazna\n");
+		return 0;
+	}
+
+	PZAPOSLENIH pom = glava;
+
+	while (pom != NULL) {
+		if (pom->podatak.sifraZaposlenog == sifraZap) {
+			printf("\nZaposleni sa tom sifrom postoji u listi zaposlenih\n");
+			return 1;
+		}
+		pom = pom->sledeci;
+	}
+	printf("\nZaposleni sa tom sifrom ne postoji u listi zaposlenih\n");
+	return 0;
+}
+
+// RADI
+ZAPOSLEN unosZaposlenog() {
+	ZAPOSLEN novi;
+	novi.isplata = NULL;
+
+	printf("Unesite sifru zaposlenog \n");
+	scanf("%d", &novi.sifraZaposlenog);
+	getchar();
+
+	printf("Unesite ime zaposlenog \n");
+	gets(novi.ime);
+	
+	printf("Unesite prezime zaposlenog \n");
+	gets(novi.prezime);
+	
+	printf("Unesite radno mesto zaposlenog \n");
+	gets(novi.radnomesto);
+
+	printf("\nZaposleni uspesno unesen \n");
+
+	return novi;
+}
+
+ISPLATA unosIsplate() {
+	ISPLATA nova;
+
+	printf("Unesite sifru isplate \n");
+	scanf("%d", &nova.sifraIsplate);
+	getchar();
+
+	printf("Unesite iznos isplate \n");
+	scanf("%lf", &nova.iznos);
+	getchar();
+
+	printf("Unesite datum isplate \n");
+	gets(nova.datum);
+	
+
+	printf("Unesite sifru osnova isplate \n");
+	scanf("%d", &nova.opisOsnova.sifraOsnova );
+	getchar();
+
+	printf("Unesite opis osnova isplate \n");
+	gets(nova.opisOsnova.opis );
+	
+
+	printf("\nIsplata uspesno unesena \n");
+
+	return nova;
+}
+
+// RADI
+void dodajZaposlenog(PZAPOSLENIH* glava) {
+
+	PZAPOSLENIH novi = malloc(sizeof(LISTAZAPOSLENIH));
+	novi->sledeci = NULL;
+	
+	novi->podatak = unosZaposlenog();
+
+	if (*glava == NULL) {
+		printf("\nLista je prazna\n");
+		*glava = novi;
+		printf("\nUspesno unet novi zaposleni u listu zaposlenih\n");
+		return;
+	}
+
+	PZAPOSLENIH pom = *glava;
+
+	while (pom->sledeci != NULL) {
+		pom = pom->sledeci;
+	}
+	pom->sledeci = novi;
+
+	
+}
+
+void dodajIsplatu(PZAPOSLENIH *glava) {
+	int sifraZap;
+	printf("Za kog zaposlenog zelite da unesete isplatu?\n");
+	printf("Unesite njegovu sifru:\n");
+	scanf("%d", &sifraZap);
+	getchar();
+
+	// s obzirom da ovde trazis zaposlenog sa datom sifrom
+	// nema potrebe da vracas int, nego vrati pokazvac na zaposlenog
+	// ako ga nadjes, ili NULL ako ga ne nadjes
+	if (postojiZaposleni(*glava, sifraZap) == 0) {
+		printf("Ovakav zaposleni ne postoji u firmi\n");
+		return;
+	}
+
+	PZAPOSLENIH pom = *glava;
+
+	while (pom->podatak.sifraZaposlenog != sifraZap) {
+		pom = pom->sledeci;
+	}
+
+
+	PISPLATA nova = malloc(sizeof(ISPLATA));
+	nova->sledeci = NULL;
+
+	ISPLATA novaIsplata = unosIsplate();
+	nova->podatak = novaIsplata;
+
+	if ((pom)->podatak.isplata == NULL) {
+		printf("\nNema isplate za ovog radnika");
+		(pom)->podatak.isplata = nova;
+		printf("\nUspesno uneta isplata u listu isplata zaposlenog\n");
+		return;
+	}
+
+	PISPLATA pomocna_isplata = pom->podatak.isplata;
+
+	while (pomocna_isplata->sledeci != NULL) {
+		pomocna_isplata = pomocna_isplata->sledeci;
+	}
+	pomocna_isplata->sledeci = nova;
+	printf("\nUspesno uneta isplata u listu isplata zaposlenog NA KRAJU\n");
+
+}
+
+// RADI
+void prikaziZaposlene(PZAPOSLENIH glava) {
+	if (glava == NULL) {
+		printf("\nLista zaposlenih je prazna\n");
+		return;
+	}
+
+	printf("\nZaposleni su:\n");
+
+	PZAPOSLENIH pom = glava;
+
+	while (pom != NULL) {
+		printf("%d %s %s\n", pom->podatak.sifraZaposlenog, pom->podatak.ime, pom->podatak.prezime);
+		pom = pom->sledeci;
+	}
+
+	printf("\n\n");
+}
+
+// RADI
+void prikaziIsplate(PZAPOSLENIH glava) {
+	if (glava == NULL) {
+		printf("\nLista zaposlenih je prazna\n");
+		return;
+	}
+
+	printf("\nIsplate su:\n");
+
+	PZAPOSLENIH pom = glava;
+
+
+	while (pom != NULL) {
+		printf("Ovo su sve isplate za ovog radnika, sa sifrom %d \n", pom->podatak.sifraZaposlenog);
+		PISPLATA pomocna_isplata = pom->podatak.isplata;
+		while (pomocna_isplata != NULL) {
+			printf("isplata: sifra = %d, datum = %d, iznos = %d, osnov = %c \n", pomocna_isplata->podatak.sifraIsplate, pomocna_isplata->podatak.datum, pomocna_isplata->podatak.iznos, pomocna_isplata->podatak.opisOsnova);
+			pomocna_isplata = pomocna_isplata->sledeci;
+		}
+		pom = pom->sledeci;
+	}
+	printf("\n\n");
+}
+
+// RADI
+void izbaciZaposlenog(PZAPOSLENIH* glava) {
+	int sifra;
+
+	printf("Unesite sifru zaposlenog kog zelite da izbacite\n");
+	scanf("%d", &sifra);
+	getchar();
+
+
+	if (postojiZaposleni(*glava, sifra) == 0) {
+		printf("Unesi dobru shifru zaposlenog kom dajesh otkaz\n");
+		return;
+	}
+
+	if (*glava == NULL) {
+		printf("\nLista zaposlenih je prazna\n");
+		return;
+	}
+
+	if ((*glava)->podatak.sifraZaposlenog == sifra) {
+		(*glava) = (*glava)->sledeci;
+		printf("\nZaposleni je pokupio prnje i otishao na biro\n");
+		return;
+	}
+
+	PZAPOSLENIH pom = *glava;
+	PZAPOSLENIH otkaz = vratiZaposlenog(*glava, sifra);
+
+	while (pom->sledeci != otkaz) {
+		pom = pom->sledeci;
+	}
+
+	pom->sledeci = pom->sledeci->sledeci;
+
+	printf("\nZaposleni je pokupio prnje i otishao na biro\n\n");
+
+}
+
+void kreiranjeIzvestaja(PZAPOSLENIH glava) {
+	FILE* izvestaj = fopen("izvestaj.txt", "w");
+	if (izvestaj == NULL) {
+		return;
+	}
+
+	fprintf(izvestaj, "-----------------------------\n");
+	fprintf(izvestaj, "-----------------------------\n");
+	fprintf(izvestaj, "------I Z V E S T A J--------\n");
+
+	fclose(izvestaj);
+
+	printf("\nIzvestaj je uspesno kreiran!!1389\n");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int meni() {
+	int izbor;
+
+	printf("##########################################\n");
+	printf(" Dobrodoshli na projekat TODORA COROVICA \n");
+	printf("##########################################\n");
+
+	printf("Izaberite neku od sledecih opcija\n");
+	printf("1. Dodaj novog zaposlenog \n");
+	printf("2. Daj otkaz zaposlenom\n");
+	printf("3. Napravi novu isplatu\n");
+	printf("4. Obrisi staru isplatu\n");
+	printf("5. Snimi sve izmene nad bazom podataka Zaposlenih \n");
+	printf("6. Snimi sve izmene nad bazom podataka Isplate\n");
+	printf("7. Napravi izvestaj\n");
+
+	printf("0. Izlazak iz programa\n");
+	scanf("%d", &izbor);
+
+	return izbor;
+}
+
+int main() {
+	PZAPOSLENIH* zaposleni = NULL;
+	int izbor;
+
+
+	do {
+		izbor = meni();
+		switch (izbor) {
+		case 1: // gotovo
+			printf("Izabrali ste prvu opciju\n");
+			dodajZaposlenog(&zaposleni);
+			prikaziZaposlene(zaposleni);
+			break;
+		case 2: // gotovo
+			printf("Izabrali ste drugu opciju\n");
+			izbaciZaposlenog(&zaposleni);
+			break;
+		case 3:
+			printf("Izabrali ste trecu opciju\n");
+			dodajIsplatu(&zaposleni);
+			prikaziIsplate(zaposleni);
+			break;
+		case 4:
+			printf("Izabrali ste cetvrtu opciju\n");
+			break;
+		case 5: // gotovo
+			printf("Izabrali ste petu opciju\n");
+			snimiSveIzmeneNadBazomZaposleni(zaposleni);
+			break;
+		case 6:
+			printf("Izabrali ste sestu opciju\n");
+			break;
+		case 7:
+			printf("Izabrali ste sedmu opciju\n");
+			kreiranjeIzvestaja(zaposleni);
+			break;
+		case 0:
+			printf("Da li ste stvarno sigurni da zelite da izadjete iz ovako genijalnog programa\n");
+			printf("Unesite 69 za izlaz\n");
+			int izborko;
+			scanf("%d", &izborko);
+			if (izborko == 69) {
+				return;
+			}
+			break;
+		default:
+			printf("\n\nKralju uneo si pogresnu cifru\n\n");
+		}
+	} while (1);
+
+	system("pause");
+	return 0;
+}
