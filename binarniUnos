@@ -1,0 +1,265 @@
+# define _CRT_SECURE_NO_WARNINGS
+# include <stdio.h>
+# include <string.h>
+# include <ctype.h>
+# include <limits.h>
+
+typedef enum radnoMesto { Car, Kralj, Regent, Zupan, Vozd, Knez } RM;
+
+typedef struct osnov {
+	int sifraOsnova;
+	char opis[100];
+}OSNOV;
+
+typedef struct isplata {
+	int sifraIsplate;
+	char datum[100];
+	double iznos;
+	OSNOV opisOsnova;
+}ISPLATA;
+
+typedef struct listaisplata* PISPLATA;
+typedef struct listaisplata {
+	ISPLATA podatak;
+	PISPLATA sledeci;
+}LISTAISPLATA;
+
+typedef struct zaposlen {
+	int sifraZaposlenog;
+	char ime[20];
+	char prezime[30];
+	RM pozicija;
+	PISPLATA isplata;
+}ZAPOSLEN;
+
+typedef struct listazaposlenih* POKAZIVAC;
+typedef struct listazaposlenih {
+	ZAPOSLEN podatak;
+	POKAZIVAC sledeci;
+}LISTAZAPOSLENIH;
+
+
+
+
+// RADI
+void unesiZaposleneUDatoteke(POKAZIVAC glava) {
+	FILE* datoteka = fopen("zaposleni.dat", "wb+");
+	int sifraZaposlenog;
+	char ime;
+	char prezime;
+	int titula;
+	RM pozicija;
+	PISPLATA isplata;
+
+	int KRAJ = 1;
+	char OPERACIJA;
+
+	if (datoteka == NULL) {
+		printf("\nOva datoteka nije lepo formirana!!1389\n");
+		return;
+	}
+
+	while (KRAJ != 0) {
+		printf("Unesite sifru zaposlenog:\n");
+		scanf("%d", &sifraZaposlenog);
+		fwrite(&sifraZaposlenog, sizeof(int), 1, datoteka);
+		fflush(datoteka);
+
+		printf("Unesite ime zaposlenog:\n");
+		getchar();
+		scanf("%c", &ime);
+		fwrite(&ime, sizeof(char), 1, datoteka);
+		fflush(datoteka);
+
+
+		printf("Unesite prezime zaposlenog:\n");
+		getchar();
+		scanf("%c", &prezime);
+		fwrite(&prezime, sizeof(char), 1, datoteka);
+		fflush(datoteka);
+
+		printf("Unesite radno mesto zaposlenog:\n");
+		getchar();
+		scanf("%d", &titula);
+		fwrite(&titula, sizeof(int), 1, datoteka);
+		fflush(datoteka);
+
+
+		printf("Da li zelite da unesete josh nekog zaposlenog? [N ili n za ne]\n");
+		getchar();
+		scanf("%c", &OPERACIJA);
+		if (OPERACIJA == 'N' || OPERACIJA == 'n') {
+			KRAJ = 0;
+		}
+	}
+		 
+		
+
+
+	fclose(datoteka);
+
+}
+
+// RADI
+void ucitajZaposlene(POKAZIVAC glava) {
+	FILE* datoteka = fopen("zaposleni.dat", "rb+");
+	int sifraZaposlenog;
+	char ime;
+	char prezime;
+	int titula;
+	RM pozicija;
+	PISPLATA isplata;
+
+	int KRAJ = 1;
+	char OPERACIJA;
+
+	if (datoteka == NULL) {
+		printf("\nOva datoteka nije lepo formirana!!1389\n");
+		return;
+	}
+
+	printf("SADRZAJ DATOTEKE: \n");
+
+	while (fread(&sifraZaposlenog, sizeof(int), 1, datoteka) != 0){
+		fread(&ime, sizeof(char), 1, datoteka);
+		fread(&prezime, sizeof(char), 1, datoteka);
+		fread(&titula, sizeof(int), 1, datoteka);
+
+		printf("%d\t", sifraZaposlenog);
+		printf("%c\t", ime);
+		printf("%c\t", prezime);
+		printf("%d\t", titula);
+		
+		printf("\n");
+	}
+		
+	printf("\n");
+	
+
+	fclose(datoteka);
+}
+ //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void unesiZaposleneUDatoteke1(POKAZIVAC glava) {
+	FILE* datoteka = fopen("zaposleni.dat", "wb+");
+	int sifraZaposlenog;
+	char ime[20];
+	char prezime[30];
+	char titula[20];
+	RM pozicija;
+	PISPLATA isplata;
+
+	int KRAJ = 1;
+	char OPERACIJA;
+
+	if (datoteka == NULL) {
+		printf("\nOva datoteka nije lepo formirana!!1389\n");
+		return;
+	}
+
+	while (KRAJ != 0) {
+		printf("Unesite sifru zaposlenog:\n");
+		scanf("%d", &sifraZaposlenog);
+		getchar();
+		fwrite(&sifraZaposlenog, sizeof(int), 1, datoteka);
+		fflush(datoteka);
+
+		printf("Unesite ime zaposlenog:\n");
+		gets(ime);
+		fwrite(&ime, sizeof(ime), 1, datoteka);
+		fflush(datoteka);
+
+
+		printf("Unesite prezime zaposlenog:\n");
+		gets(prezime);
+		fwrite(&prezime, sizeof(prezime), 1, datoteka);
+		fflush(datoteka);
+
+		printf("Unesite radno mesto zaposlenog:\n");
+		gets(titula);
+		fwrite(&titula, sizeof(titula), 1, datoteka);
+		fflush(datoteka);
+
+
+		printf("Da li zelite da unesete josh nekog zaposlenog? [N ili n za ne]\n");
+		scanf("%c", &OPERACIJA);
+		getchar();
+		if (OPERACIJA == 'N' || OPERACIJA == 'n') {
+			KRAJ = 0;
+		}
+	}
+
+
+
+
+	fclose(datoteka);
+
+}
+
+// RADI
+void ucitajZaposlene1(POKAZIVAC glava) {
+	FILE* datoteka = fopen("zaposleni.dat", "rb+");
+	int sifraZaposlenog;
+	char ime[20];
+	char prezime[30];
+	char titula[20];
+	RM pozicija;
+	PISPLATA isplata;
+
+	int KRAJ = 1;
+	char OPERACIJA;
+
+	if (datoteka == NULL) {
+		printf("\nOva datoteka nije lepo formirana!!1389\n");
+		return;
+	}
+
+	printf("SADRZAJ DATOTEKE: \n");
+
+	while (fread(&sifraZaposlenog, sizeof(int), 1, datoteka) != 0) {
+		fread(&ime, sizeof(ime), 1, datoteka);
+		fread(&prezime, sizeof(prezime), 1, datoteka);
+		fread(&titula, sizeof(titula), 1, datoteka);
+
+		printf("%d", sifraZaposlenog);
+		printf("\t%s\t", ime);
+		printf("\t%s\t", prezime);
+		printf("\t%s\t", titula);
+
+		printf("\n");
+	}
+
+	printf("\n");
+
+
+	fclose(datoteka);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+int main() {
+	POKAZIVAC zaposleni = NULL;
+
+
+	printf("\nMOJA VELIKA KURCINA \n");
+	
+	//unesiZaposleneUDatoteke1(zaposleni);
+	ucitajZaposlene1(zaposleni);
+	
+
+	system("pause");
+	return 0;
+}
